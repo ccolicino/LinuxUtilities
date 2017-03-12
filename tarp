@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# tarp - tar with progress
+
+help()
+{
+    echo "Usage:"
+    echo "  Compression: tarp c[zjb] [NEW_ARCHIVE] [FILES_TO_ARCHIVE]"
+    echo "  Extraction:  tarp x [ARCHIVE]"
+    echo "  Help:        tarp --help"
+    exit 0
+}
+
+if ! hash pv 2>/dev/null; then
+    echo "pv not installed, which is required"
+    exit 1
+fi
+
+echo "OPTIONS = $OPTIONS"
+
+if [[ $OPTIONS == *"x"* ]]; then
+    ARCHIVE=$2
+    if [[ $ARCHIVE == *".xz" ]]; then
+        pv $2 | xzcat | tar -xpC .
+    elif [[ $ARCHIVE == *".gz" ]]; then
+        pv $2 | gunzip | tar -xpC .
+    elif [[ $OPTIONS == *".bz2" ]]; then
+        pv $2 | bzip2 -d | tar -xpC .
+    else
+        echo "Unknown compression format"
+        exit 1
+    fi
+fi
+
